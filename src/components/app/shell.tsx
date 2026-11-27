@@ -26,9 +26,9 @@ export function memberNav(t: Dict): NavGroup[] {
       { href: "/app/practice", label: i.practice, icon: <Dumbbell />, phase: 4 },
     ] },
     { label: g.ai, items: [
-      { href: "/app/ai-coach", label: i.aiCoach, icon: <Bot />, phase: 2 },
-      { href: "/app/mix-lab", label: i.mixLab, icon: <AudioWaveform />, phase: 2 },
-      { href: "/app/set-builder", label: i.setBuilder, icon: <ListMusic />, phase: 2 },
+      { href: "/app/ai-coach", label: i.aiCoach, icon: <Bot /> },
+      { href: "/app/mix-lab", label: i.mixLab, icon: <AudioWaveform /> },
+      { href: "/app/set-builder", label: i.setBuilder, icon: <ListMusic /> },
     ] },
     { label: g.connect, items: [
       { href: "/app/community", label: i.community, icon: <Users />, phase: 3 },
@@ -68,7 +68,7 @@ export function instructorNav(t: Dict): NavGroup[] {
     { href: "/instructor/students", label: n.students, icon: <Users /> },
     { href: "/instructor/lessons", label: n.lessons, icon: <NotebookPen /> },
     { href: "/instructor/assignments", label: n.assignments, icon: <ClipboardList />, phase: 2 },
-    { href: "/instructor/reviews", label: n.reviews, icon: <Star />, phase: 2 },
+    { href: "/instructor/reviews", label: n.reviews, icon: <Star /> },
     { href: "/instructor/earnings", label: n.earnings, icon: <Wallet /> },
   ] }];
 }
@@ -91,7 +91,7 @@ export function adminNav(t: Dict): NavGroup[] {
       { href: "/admin/battles", label: n.battles, icon: <Swords />, phase: 3 },
     ] },
     { label: "SYSTEM", items: [
-      { href: "/admin/ai-usage", label: n.aiUsage, icon: <Cpu />, phase: 2 },
+      { href: "/admin/ai-usage", label: n.aiUsage, icon: <Cpu /> },
       { href: "/admin/settings", label: n.settings, icon: <ShieldCheck /> },
     ] },
   ];

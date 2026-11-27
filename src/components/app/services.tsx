@@ -8,7 +8,7 @@ const LIST: { key: keyof typeof services | "db"; name: string; env: string }[] =
   { key: "stripe", name: "Stripe (card / PromptPay)", env: "STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET" },
   { key: "daily", name: "Daily (video calls)", env: "DAILY_API_KEY" },
   { key: "email", name: "Resend (email)", env: "RESEND_API_KEY, EMAIL_FROM" },
-  { key: "llm", name: "LLM (AI Coach, Phase 02)", env: "ANTHROPIC_API_KEY" },
+  { key: "llm", name: "Claude API (AI Coach)", env: "ANTHROPIC_API_KEY" },
 ];
 
 export function ServiceStatus({ t }: { t: Dict }) {

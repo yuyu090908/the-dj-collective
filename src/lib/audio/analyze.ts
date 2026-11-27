@@ -193,7 +193,7 @@ export async function analyze(channels: Float32Array[], sr: number, onProgress: 
   let peak = 0, sLL = 0, sRR = 0, sLR = 0;
   const clipTimes: number[] = [];
   let clipEvents = 0;
-  const runs = [0, 0];
+  let run = 0; // consecutive samples where any channel is at full scale
   const [f1, f2] = kWeighting(sr);
   const z = Array.from({ length: nch }, () => [0, 0, 0, 0]); // biquad states per channel
   const sub = Math.round(sr * 0.1);
@@ -209,10 +209,6 @@ export async function analyze(channels: Float32Array[], sr: number, onProgress: 
         const v = x[i];
         const a = v < 0 ? -v : v;
         if (a > peak) peak = a;
-        if (a >= 0.999) {
-          runs[c]++;
-          if (runs[c] === 3) { clipEvents++; if (clipTimes.length < 200) clipTimes.push(r1(i / sr)); }
-        } else runs[c] = 0;
         // stage 1
         const y1 = f1.b0 * v + st[0];
         st[0] = f1.b1 * v - f1.a1 * y1 + st[1];
@@ -225,7 +221,14 @@ export async function analyze(channels: Float32Array[], sr: number, onProgress: 
         if (k < nSub) subE[k] += (y2 * y2) / sub;
       }
     }
-    if (nch > 1) for (let i = start; i < end; i++) { sLL += L[i] * L[i]; sRR += R[i] * R[i]; sLR += L[i] * R[i]; }
+    for (let i = start; i < end; i++) {
+      const l = L[i], r = R[i];
+      if (nch > 1) { sLL += l * l; sRR += r * r; sLR += l * r; }
+      if ((l < 0 ? -l : l) >= 0.999 || (r < 0 ? -r : r) >= 0.999) {
+        run++;
+        if (run === 3) { clipEvents++; if (clipTimes.length < 200) clipTimes.push(r1(i / sr)); }
+      } else run = 0;
+    }
     onProgress("loudness", (end / N) * 100);
     await tick();
   }
@@ -260,13 +263,13 @@ export async function analyze(channels: Float32Array[], sr: number, onProgress: 
     const v = st1[Math.round(t)];
     shortTerm.push(v === undefined || v < -70 ? null : r1(v));
   }
-  // gaps: ≥ 2 s below -45 LUFS short-term, ignoring the first/last 10 s
+  // gaps: ≥ 2 s of 100 ms blocks below -50 LUFS, ignoring the first/last 10 s
   const gaps: { t: number; dur: number }[] = [];
   let gStart = -1;
-  for (let i = 0; i <= st1.length; i++) {
-    const quiet = i < st1.length && st1[i] < -45 && i > 10 && i < st1.length - 10;
-    if (quiet && gStart < 0) gStart = i;
-    if (!quiet && gStart >= 0) { if (i - gStart >= 2) gaps.push({ t: gStart, dur: i - gStart }); gStart = -1; }
+  for (let k = 0; k <= nSub; k++) {
+    const quiet = k < nSub && lufs(subE[k]) < -50 && k >= 100 && k < nSub - 100;
+    if (quiet && gStart < 0) gStart = k;
+    if (!quiet && gStart >= 0) { if (k - gStart >= 20) gaps.push({ t: r1(gStart / 10), dur: r1((k - gStart) / 10) }); gStart = -1; }
   }
 
   // 2) spectral pass A — onset envelope (~11 ms hop) for tempo
