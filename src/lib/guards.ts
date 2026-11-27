@@ -1,6 +1,5 @@
 import "server-only";
 import { redirect } from "next/navigation";
-import { headers } from "next/headers";
 import { getSessionUser, type Role, type SessionUser } from "./auth/session";
 import { lp, type Locale } from "./i18n/config";
 
@@ -58,7 +57,4 @@ export async function assertInstructor(): Promise<SessionUser> {
   return u;
 }
 
-export async function clientIp(): Promise<string> {
-  const h = await headers();
-  return h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "unknown";
-}
+export { clientIp } from "./request";

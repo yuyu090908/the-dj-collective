@@ -24,7 +24,7 @@ function EnergyChart({ tracks, slot, s }: { tracks: SetTrack[]; slot: Slot; s: S
     <figure className="rounded-[8px] border border-line p-4" data-testid="energy-chart">
       <figcaption className="mb-2 text-sm font-medium">{fmt(s.energyChart, { slot: s.slots[slot] })}</figcaption>
       <svg viewBox={`0 0 ${W} ${H}`} className="h-36 w-full" role="img" aria-label={fmt(s.energyChart, { slot: s.slots[slot] })}>
-        {[1, 5, 10].map((e) => <g key={e}><line x1={0} x2={W} y1={y(e)} y2={y(e)} stroke="#303030" /><text x={2} y={y(e) - 3} fill="#858581" fontSize="10">{e}</text></g>)}
+        {[1, 5, 10].map((e) => <g key={e}><line x1={0} x2={W} y1={y(e)} y2={y(e)} stroke="#303030" /><text x={2} y={e === 10 ? y(e) + 11 : y(e) - 3} fill="#858581" fontSize="10">{e}</text></g>)}
         <path d={guide} fill="none" stroke="#f0ede5" strokeOpacity={0.5} strokeDasharray="5 4" />
         {has && <path d={d} fill="none" stroke="#c4f34d" strokeWidth={2} />}
         {tracks.map((t, i) => t.energy != null && <circle key={i} cx={x(i)} cy={y(t.energy)} r={3.5} fill="#c4f34d" />)}
@@ -67,7 +67,7 @@ export function SetEditor({ id, s, library, initial }: {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 rounded-[8px] border border-line p-4 sm:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-3 rounded-[8px] border border-line p-4 sm:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
         <label className="block"><span className="mb-1 block text-xs text-stone">{s.setTitle}</span>
           <input value={title} maxLength={120} onChange={(e) => { setTitle(e.target.value); setDirty(true); }} className={inputCls} /></label>
         <label className="block"><span className="mb-1 block text-xs text-stone">{s.minutes}</span>
@@ -92,7 +92,7 @@ export function SetEditor({ id, s, library, initial }: {
       </div>
       {msg && <Alert kind={msg.kind}>{msg.text}</Alert>}
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <div className="space-y-4">
           <ol className="rounded-[8px] border border-line" data-testid="set-tracks">
             {tracks.length === 0 && <li className="px-4 py-6 text-sm text-stone">{s.emptySet}</li>}

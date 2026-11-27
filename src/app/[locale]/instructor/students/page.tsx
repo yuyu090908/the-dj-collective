@@ -2,7 +2,7 @@ import { instructorPage } from "@/lib/page-guards";
 import { q } from "@/lib/db";
 import { PageTitle } from "@/components/app/shell";
 import { NotLinked } from "@/components/app/not-linked";
-import { Empty, Tag } from "@/components/ui";
+import { Empty, L, Tag } from "@/components/ui";
 import { dateTime } from "@/lib/i18n/format";
 
 type S = { user_id: string; name: string; experience_level: string; genres: string[]; equipment: string[]; lessons: number; last: string | null; next: string | null };
@@ -45,7 +45,7 @@ export default async function Students({ params }: PageProps<"/[locale]/instruct
           </table>
         </div>
       ) : <Empty title={t.common.none} />}
-      <p className="mt-4 text-xs text-stone">AI Mix Lab history: <Tag kind="phase">Phase 02</Tag></p>
+      <p className="mt-4 text-sm"><L locale={locale} href="/instructor/reviews" className="inline-flex min-h-11 items-center underline underline-offset-4">{t.instructor.nav.reviews} →</L></p>
     </>
   );
 }

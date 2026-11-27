@@ -15,7 +15,7 @@ test("admin must enrol and verify TOTP before the admin area", async ({ page }) 
   const secret = (await page.getByTestId("totp-secret").textContent())!.trim();
   await page.locator('input[name="code"]').fill("000000");
   await page.locator('form button[type="submit"]').click();
-  await expect(page.getByRole("alert").first()).toBeVisible();
+  await expect(page.locator("form").getByRole("alert")).toBeVisible(); // scoped: Next.js route announcer also has role=alert
   await page.locator('input[name="code"]').fill(totp(secret));
   await page.locator('form button[type="submit"]').click();
   await page.waitForURL(/\/admin\/dashboard/);

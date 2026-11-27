@@ -61,9 +61,9 @@ export async function reviewsFor(resultId: string) {
 /** Shared analyses of this instructor's students, newest first. */
 export async function sharedWithInstructor(instructorUserId: string) {
   return q<{ id: string; title: string; created_at: string; student: string; overall: number | null; reviewed: boolean }>(
-    `select r.id, r.title, r.created_at, coalesce(nullif(su.display_name,''), split_part(su.email,'@',1)) student, (r.scores->>'overall')::int overall,
+    `select r.id, r.title, r.created_at, coalesce(nullif(sp.display_name,''), split_part(su.email,'@',1)) student, (r.scores->>'overall')::int overall,
             exists(select 1 from analysis_reviews a join instructors i on i.id=a.instructor_id where a.result_id=r.id and i.user_id=$1) reviewed
-       from mix_analysis_results r join users su on su.id=r.user_id
+       from mix_analysis_results r join users su on su.id=r.user_id left join profiles sp on sp.user_id=r.user_id
       where r.shared_with_instructor and exists (
         select 1 from bookings b join instructors i on i.id=b.instructor_id
          where i.user_id=$1 and b.user_id=r.user_id and b.status in ('confirmed','completed'))

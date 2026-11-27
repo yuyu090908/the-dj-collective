@@ -4,6 +4,7 @@ import { q, q1 } from "./db";
 import { env } from "./env";
 import { COACH_PRICE, getUsage, getUserPlan, recordUsage } from "./plan";
 import type { Locale } from "./i18n/config";
+import type { Analysis } from "./audio/analyze";
 
 export const COACH_MODEL = "claude-opus-5-5";
 const MAX_HISTORY = 20;
@@ -75,16 +76,16 @@ export async function buildContext(c: Ctx) {
   }
 
   if (c.mixId && UUID.test(c.mixId)) {
-    const r = await q1<{ title: string; measured: Record<string, unknown>; estimated: Record<string, any>; scores: Record<string, unknown>; duration_sec: number; id: string }>(
+    const r = await q1<{ title: string; measured: Analysis["measured"] & { sampleRate: number }; estimated: Analysis["estimated"]; scores: Record<string, unknown>; duration_sec: number; id: string }>(
       `select r.id, r.title, r.measured, r.estimated, r.scores, u.duration_sec from mix_analysis_results r
          join mix_analysis_jobs j on j.id=r.job_id join audio_uploads u on u.id=j.upload_id where r.id=$1 and r.user_id=$2`, [c.mixId, c.userId]);
     if (r) {
-      const m = r.measured as Record<string, any>, e = r.estimated;
+      const m = r.measured, e = r.estimated;
       const reviews = await q<{ comment: string }>(`select comment from analysis_reviews where result_id=$1 order by created_at`, [r.id]);
       lines.push(
         `MIX ANALYSIS "${r.title}" (${Math.round(r.duration_sec / 60)} min, analysed in the browser at ${m.sampleRate} Hz):`,
-        `  measured: integrated ${m.integratedLufs} LUFS, loudness range ${m.lra} LU, sample peak ${m.peakDbfs} dBFS, clipping events ${m.clipEvents}${m.clipTimes?.length ? ` at ${m.clipTimes.slice(0, 10).map((t: number) => mmss(t)).join(", ")}` : ""}, stereo correlation ${m.stereoCorrelation}, silent gaps ${m.gaps?.length ?? 0}${m.gaps?.length ? ` at ${m.gaps.slice(0, 10).map((g: { t: number }) => mmss(g.t)).join(", ")}` : ""}.`,
-        `  estimated: tempo ${e.bpm?.value} BPM (confidence ${e.bpm?.confidence}, range ${e.bpm?.min}–${e.bpm?.max}), key ${e.key?.camelot ?? "unknown"} ${e.key?.name ?? ""} (confidence ${e.key?.confidence}), key timeline ${(e.key?.segments ?? []).filter((s: { c: number }) => s.c >= 0.5).map((s: { t: number; camelot: string }) => `${mmss(s.t)} ${s.camelot}`).slice(0, 30).join(", ") || "n/a"}, possible transitions ${(e.transitions ?? []).map((x: { t: number; reasons: string[] }) => `${mmss(x.t)} (${x.reasons.join("+")})`).slice(0, 30).join(", ") || "none"}.`,
+        `  measured: integrated ${m.integratedLufs} LUFS, loudness range ${m.lra} LU, sample peak ${m.peakDbfs} dBFS, clipping events ${m.clipEvents}${m.clipTimes?.length ? ` at ${m.clipTimes.slice(0, 10).map(mmss).join(", ")}` : ""}, stereo correlation ${m.stereoCorrelation}, silent gaps ${m.gaps?.length ?? 0}${m.gaps?.length ? ` at ${m.gaps.slice(0, 10).map((g) => mmss(g.t)).join(", ")}` : ""}.`,
+        `  estimated: tempo ${e.bpm?.value} BPM (confidence ${e.bpm?.confidence}, range ${e.bpm?.min}–${e.bpm?.max}), key ${e.key?.camelot ?? "unknown"} ${e.key?.name ?? ""} (confidence ${e.key?.confidence}), key timeline ${(e.key?.segments ?? []).filter((s) => s.c >= 0.5).map((s) => `${mmss(s.t)} ${s.camelot}`).slice(0, 30).join(", ") || "n/a"}, possible transitions ${(e.transitions ?? []).map((x) => `${mmss(x.t)} (${x.reasons.join("+")})`).slice(0, 30).join(", ") || "none"}.`,
         `  rule-based scores (fixed formulas, not a judgement): ${JSON.stringify(r.scores)}.`,
         ...(reviews.length ? [`  instructor reviews: ${reviews.map((x) => JSON.stringify(x.comment)).join(" | ")}`] : []),
       );

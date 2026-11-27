@@ -7,7 +7,7 @@ import { mfaAction } from "@/lib/auth/actions";
 import { getSessionUser } from "@/lib/auth/session";
 import { safeNext } from "@/lib/guards";
 import { lp } from "@/lib/i18n/config";
-import { q, q1 } from "@/lib/db";
+import { q1 } from "@/lib/db";
 import { newTotpSecret, otpauthUrl } from "@/lib/auth/totp";
 
 export const metadata = { robots: { index: false } };
@@ -25,12 +25,14 @@ export default async function Mfa({ params, searchParams }: PageProps<"/[locale]
   if (!user.totpEnabled) {
     let row = await q1<{ totp_secret: string | null }>(`select totp_secret from users where id=$1`, [user.id]);
     if (!row?.totp_secret) {
-      const s = newTotpSecret();
-      await q(`update users set totp_secret=$2 where id=$1 and totp_enabled=false`, [user.id, s]);
-      row = { totp_secret: s };
+      // concurrent renders must agree on one secret: only set it if still empty, then use what is stored
+      row = await q1<{ totp_secret: string | null }>(
+        `update users set totp_secret=coalesce(totp_secret, $2) where id=$1 and totp_enabled=false returning totp_secret`,
+        [user.id, newTotpSecret()],
+      );
     }
-    const url = otpauthUrl(row.totp_secret!, user.email);
-    enroll = { secret: row.totp_secret!, svg: await QRCode.toString(url, { type: "svg", margin: 1, color: { dark: "#101010", light: "#F0EDE5" } }) };
+    const url = otpauthUrl(row!.totp_secret!, user.email);
+    enroll = { secret: row!.totp_secret!, svg: await QRCode.toString(url, { type: "svg", margin: 1, color: { dark: "#101010", light: "#F0EDE5" } }) };
   }
   const a = t.auth;
   return (

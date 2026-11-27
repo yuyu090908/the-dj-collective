@@ -55,6 +55,24 @@ async function denied(role: "anon" | "authenticated", sub: string | null, sql: s
   const other = await as("authenticated", a, "select * from bookings where user_id=$1", [b]);
   assert.equal(other.length, 0); ok("member cannot read another member's bookings");
 
+  // Phase 02 tables: owners read their own rows only; nobody writes through the API roles
+  for (const tbl of ["mix_analysis_results", "audio_uploads", "ai_conversations", "ai_usage", "library_tracks", "dj_sets", "quiz_attempts", "skill_scores", "subscriptions"]) {
+    assert.equal((await as("anon", null, `select * from ${tbl}`).catch(() => [])).length, 0);
+    const rows = await as<{ user_id: string }>("authenticated", a, `select user_id from ${tbl}`).catch(() => [] as { user_id: string }[]);
+    assert.ok(rows.every((r) => r.user_id === a), tbl);
+  }
+  ok("phase 02 tables: anon sees nothing, members see only their own rows");
+  for (const sql of [
+    `insert into dj_sets (user_id, title) values ('${b}', 'x')`,
+    `insert into library_tracks (user_id, title) values ('${a}', 'x')`,
+    `insert into ai_usage (user_id, feature) values ('${a}', 'coach')`,
+    `update subscriptions set plan_code='stage_elite'`,
+    `insert into analysis_reviews (result_id, instructor_id, comment) values (gen_random_uuid(), gen_random_uuid(), 'x')`,
+  ]) assert.ok(await denied("authenticated", a, sql), sql);
+  ok("phase 02 tables are not writable by API roles (no quota or plan tampering)");
+  const shared = await as<{ id: string }>("authenticated", a, "select r.id from analysis_reviews v join mix_analysis_results r on r.id=v.result_id where r.user_id <> $1", [a]);
+  assert.equal(shared.length, 0); ok("reviews of other members' analyses are hidden");
+
   console.log(`\nRLS: ${passed} checks passed`);
   await c.end();
 })().catch(async (e) => { console.error("RLS FAILED:", e); await c.end(); process.exit(1); });

@@ -74,7 +74,7 @@ export default async function AdminSettings({ params }: PageProps<"/[locale]/adm
 
       <section id="plans">
         <H>{a.plans}</H>
-        <Alert>Subscription checkout is Phase 02. Prices and quotas edited here are what the pricing page shows.</Alert>
+        <Alert>Prices and quotas edited here are what the pricing page and subscription checkout use. To let members switch plans in the Stripe billing portal, set each plan&apos;s stripe_price_id (Stripe recurring price) in the database.</Alert>
         <ul className="mt-4 space-y-4">
           {plans.map((p) => (
             <li key={p.code} className="rounded-[8px] border border-line p-5">

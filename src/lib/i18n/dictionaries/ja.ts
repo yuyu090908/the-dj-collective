@@ -141,7 +141,7 @@ const ja: Dict = {
       mixlabD: "録音から、BPMの揺れ、エネルギーカーブ、周波数バランス、トランジション位置を解析。",
       setbuilder: "AI SET BUILDER",
       setbuilderD: "会場・時間帯・出演順に合わせた、エネルギーを考えたセット構成。",
-      previewNote: "サンプルデータによるUIプレビューです。Phase 02で公開予定。",
+      previewNote: "サンプルデータによるUIプレビューです。実際の機能は会員エリアで使えます。",
       sampleAdvice: "≈12:34 — 低音域のエネルギーが急激に上昇しています。2曲のベースが重なっている可能性があります。入ってくる曲のLOW EQを早めに絞ってみましょう。",
       coachQ: "トランジションが濁って聴こえるのはどうすれば直せますか？",
       coachA: "直近2本のMIXでは、多くのトランジションで低音域が上昇しています。16小節のベーススワップを、フレーズの頭で練習しましょう。",
@@ -430,7 +430,7 @@ const ja: Dict = {
       next: "NEXT LESSON",
     },
     growth: "成長分析",
-    growthEmpty: "成長分析はレッスン受講やMIX分析を行うと表示されます（Phase 02）。",
+    growthEmpty: "Mix LabでMIXを分析するか、講師がレビューするとスキルスコアが表示されます。",
     priorityFor: {
       beginner: "まずはFoundationレベルから。基礎がすべてを楽にします。",
       intermediate: "MIXを分析して、苦手な部分を強化しましょう。",

@@ -11,7 +11,7 @@ import pg from "pg";
 const url = (process.env.DATABASE_URL ||= "postgres://postgres@localhost:5432/djc");
 if (!/localhost|127\.0\.0\.1/.test(url)) throw new Error("local database only");
 
-type Seen = { headers: http.IncomingHttpHeaders; body: any };
+type Seen = { headers: http.IncomingHttpHeaders; body: Record<string, any> }; // eslint-disable-line @typescript-eslint/no-explicit-any
 const seen: Seen[] = [];
 let mode: "ok" | "refusal" = "ok";
 

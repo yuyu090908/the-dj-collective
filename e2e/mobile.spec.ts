@@ -14,7 +14,7 @@ for (const w of WIDTHS) {
       expect(sw, `${p} @${w}`).toBeLessThanOrEqual(w);
     }
     await register(page, uniqueEmail(`m${w}`));
-    for (const p of ["/app/dashboard", "/app/my-lessons", "/app/settings", "/app/ai-coach"]) {
+    for (const p of ["/app/dashboard", "/app/my-lessons", "/app/settings", "/app/ai-coach", "/app/mix-lab", "/app/learning", "/app/subscription", "/app/set-builder", "/ja/app/ai-coach", "/th/app/mix-lab"]) {
       await page.goto(p);
       const sw = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(sw, `${p} @${w}`).toBeLessThanOrEqual(w);

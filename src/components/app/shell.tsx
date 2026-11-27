@@ -67,7 +67,7 @@ export function instructorNav(t: Dict): NavGroup[] {
     { href: "/instructor/calendar", label: n.calendar, icon: <Clock /> },
     { href: "/instructor/students", label: n.students, icon: <Users /> },
     { href: "/instructor/lessons", label: n.lessons, icon: <NotebookPen /> },
-    { href: "/instructor/assignments", label: n.assignments, icon: <ClipboardList />, phase: 2 },
+    { href: "/instructor/assignments", label: n.assignments, icon: <ClipboardList />, phase: 3 },
     { href: "/instructor/reviews", label: n.reviews, icon: <Star /> },
     { href: "/instructor/earnings", label: n.earnings, icon: <Wallet /> },
   ] }];

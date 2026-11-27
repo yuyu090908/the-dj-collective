@@ -50,26 +50,26 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
     start: [
       { kind: j.lesson, title: lessonTitle("bkk-private-60"), href: L_("/booking?lesson=bkk-private-60") },
       { kind: j.course, title: "Level 01 — Foundation", href: L_("/courses#level-1") },
-      { kind: j.tool, title: "AI DJ Coach", href: L_("/app/ai-coach"), note: "Phase 02" },
+      { kind: j.tool, title: "AI DJ Coach", href: L_("/app/ai-coach") },
     ],
     improve: [
       { kind: j.lesson, title: lessonTitle("bkk-private-90"), href: L_("/booking?lesson=bkk-private-90") },
       { kind: j.course, title: "Level 02 — Mixing", href: L_("/courses#level-2") },
-      { kind: j.tool, title: "AI Mix Lab", href: L_("/app/mix-lab"), note: "Phase 02" },
+      { kind: j.tool, title: "AI Mix Lab", href: L_("/app/mix-lab") },
     ],
     club: [
       { kind: j.lesson, title: lessonTitle("bkk-private-90"), href: L_("/booking?lesson=bkk-private-90") },
       { kind: j.course, title: "Level 04 — Performance", href: L_("/courses#level-4") },
-      { kind: j.tool, title: "AI Set Builder", href: L_("/app/set-builder"), note: "Phase 02" },
+      { kind: j.tool, title: "AI Set Builder", href: L_("/app/set-builder") },
     ],
     online: [
       { kind: j.lesson, title: lessonTitle("online-private-60"), href: L_("/booking?lesson=online-private-60") },
       { kind: j.course, title: "Level 01 — Foundation", href: L_("/courses#level-1") },
-      { kind: j.tool, title: "AI DJ Coach", href: L_("/app/ai-coach"), note: "Phase 02" },
+      { kind: j.tool, title: "AI DJ Coach", href: L_("/app/ai-coach") },
     ],
     analyze: [
       { kind: j.lesson, title: lessonTitle("online-mix-review-30"), href: L_("/booking?lesson=online-mix-review-30") },
-      { kind: j.tool, title: "AI Mix Lab", href: L_("/app/mix-lab"), note: "Phase 02" },
+      { kind: j.tool, title: "AI Mix Lab", href: L_("/app/mix-lab") },
       { kind: j.course, title: "Level 03 — Music Selection", href: L_("/courses#level-3") },
     ],
     community: [

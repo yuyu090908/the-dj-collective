@@ -55,6 +55,26 @@ if (!/localhost|127\.0\.0\.1/.test(url)) throw new Error("local database only");
   r = await send(completed);
   assert.equal((await r.json()).duplicate, true); ok("replayed event is ignored (idempotent)");
 
+  // subscriptions: created → updated (plan change, cancel at period end) → deleted
+  const subId = `sub_test_${randomUUID().replace(/-/g, "")}`;
+  const periodEnd = Math.floor(Date.now() / 1000) + 30 * 86400;
+  const subObj = (plan: string, status: string, cancel = false) => ({ id: subId, object: "subscription", customer: "cus_test_1", status, cancel_at_period_end: cancel,
+    metadata: { user_id: ctx.u, plan }, items: { object: "list", data: [{ id: "si_1", price: { id: "price_not_in_db" }, current_period_end: periodEnd }] } });
+  const subRow = async () => (await c.query(`select plan_code, status, cancel_at_period_end, extract(epoch from current_period_end)::int pe from subscriptions where provider_subscription_id=$1`, [subId])).rows[0];
+  await c.query(`insert into subscriptions (user_id, plan_code, status, provider, current_period_end) values ($1,'member','active','demo', now() + interval '1 month')`, [ctx.u]);
+  r = await send(event(`evt_${randomUUID()}`, "customer.subscription.created", subObj("member", "active")));
+  assert.equal(r.status, 200);
+  assert.deepEqual(await subRow(), { plan_code: "member", status: "active", cancel_at_period_end: false, pe: periodEnd }); ok("subscription.created → active member, period end from item");
+  const live = (await c.query(`select count(*)::int n from subscriptions where user_id=$1 and status in ('trialing','active','past_due','incomplete')`, [ctx.u])).rows[0].n;
+  assert.equal(live, 1); ok("older demo subscription retired (one live subscription per user)");
+  r = await send(event(`evt_${randomUUID()}`, "customer.subscription.updated", subObj("artist_pro", "active", true)));
+  assert.deepEqual(await subRow(), { plan_code: "artist_pro", status: "active", cancel_at_period_end: true, pe: periodEnd }); ok("subscription.updated → plan change + cancel at period end");
+  r = await send(event(`evt_${randomUUID()}`, "customer.subscription.updated", subObj("artist_pro", "unpaid")));
+  assert.equal((await subRow()).status, "past_due"); ok("unpaid maps to past_due");
+  r = await send(event(`evt_${randomUUID()}`, "customer.subscription.deleted", subObj("artist_pro", "canceled")));
+  assert.equal((await subRow()).status, "cancelled"); ok("subscription.deleted → cancelled");
+  await c.query(`delete from subscriptions where user_id=$1`, [ctx.u]);
+
   await c.query(`delete from payments where booking_id=$1`, [booking]);
   await c.query(`delete from bookings where id=$1`, [booking]);
   await c.query(`delete from webhook_events where id like 'evt_%' and type like 'checkout.%' and received_at > now() - interval '5 min'`).catch(() => {});

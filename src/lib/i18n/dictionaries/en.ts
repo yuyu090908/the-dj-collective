@@ -139,7 +139,7 @@ const en = {
       mixlabD: "BPM drift, energy curve, frequency balance and transition points from your recording.",
       setbuilder: "AI SET BUILDER",
       setbuilderD: "Energy-aware set plans for the room, the hour and your slot.",
-      previewNote: "Interface preview with sample data. Launching in Phase 02.",
+      previewNote: "Interface preview with sample data — the real tools are in your member area.",
       sampleAdvice: "≈12:34 — Low-end energy jumps sharply. Two basslines may be overlapping. Try cutting the LOW EQ earlier on the incoming track.",
       coachQ: "How do I stop my transitions sounding muddy?",
       coachA: "Your last two mixes show the low band rising at most transitions. Let's practise bass swaps: 16 bars, swap lows on the phrase.",
@@ -428,7 +428,7 @@ const en = {
       next: "NEXT LESSON",
     },
     growth: "Growth",
-    growthEmpty: "Growth analytics start once you complete lessons and analyse mixes (Phase 02).",
+    growthEmpty: "Skill scores appear once you analyse a mix in Mix Lab or an instructor reviews your work.",
     priorityFor: {
       beginner: "Start with the Foundation level — the basics make everything else easier.",
       intermediate: "Analyse a mix and work on your weak spots.",

@@ -86,7 +86,7 @@ export default async function MyLessons({ params }: PageProps<"/[locale]/app/my-
         {past.length ? <ul className="grid gap-3 lg:grid-cols-2">{past.map((r) => <Item key={r.id} r={r} actions={false} />)}</ul> : <p className="text-sm text-stone">{a.noLessons}</p>}
       </section>
       <section className="mt-10 rounded-[8px] border border-line p-5">
-        <div className="flex items-center justify-between"><h2 className="font-display text-sm font-semibold tracking-[0.12em]">{a.assignments.toUpperCase()} / {a.feedback.toUpperCase()}</h2><Tag kind="phase">Phase 02</Tag></div>
+        <div className="flex items-center justify-between"><h2 className="font-display text-sm font-semibold tracking-[0.12em]">{a.assignments.toUpperCase()} / {a.feedback.toUpperCase()}</h2><Tag kind="phase">Phase 03</Tag></div>
         <p className="mt-2 text-sm text-stone">{t.instructor.humanVsAi} <L locale={locale} href="/courses" className="underline underline-offset-4">{t.nav.courses}</L></p>
       </section>
     </>

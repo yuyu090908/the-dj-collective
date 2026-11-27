@@ -5,7 +5,7 @@ import { services } from "@/lib/env";
 import { PageTitle } from "@/components/app/shell";
 import { ActionForm } from "@/components/forms";
 import { Alert, Tag, cx } from "@/components/ui";
-import { money, dateTime, dateOnly, fmt } from "@/lib/i18n/format";
+import { money, dateOnly, fmt } from "@/lib/i18n/format";
 import { subT } from "@/lib/i18n/p2/sub";
 import { cancelDemoAction, manageBillingAction, subscribeAction } from "@/lib/subscription-actions";
 
