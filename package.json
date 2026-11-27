@@ -16,6 +16,7 @@
     "db:create-user": "tsx scripts/db.ts create-user"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.14.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.119.2",
     "lucide-react": "^1.82.0",

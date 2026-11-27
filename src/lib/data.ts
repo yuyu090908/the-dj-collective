@@ -22,7 +22,7 @@ export type Studio = {
   id: string; name: string; address: string | null; city: string; map_query: string | null; access_notes: Localized;
   equipment: string[]; is_placeholder: boolean; is_active: boolean;
 };
-export type Course = { id: string; level: number; slug: string; title: Localized; description: Localized; min_plan: string; modules: { id: string; title: Localized; kinds: string[] }[] };
+export type Course = { id: string; level: number; slug: string; title: Localized; description: Localized; min_plan: string; modules: { id: string; title: Localized; kinds: string[]; published: boolean; minutes: number | null }[] };
 
 const dbReady = () => Boolean(env.databaseUrl);
 
@@ -54,9 +54,9 @@ export const getCourses = cache(async (): Promise<Course[]> => {
   if (!dbReady()) return [];
   return q<Course>(
     `select c.id, c.level, c.slug, c.title, c.description, c.min_plan,
-            coalesce(json_agg(json_build_object('id', m.id, 'title', m.title, 'kinds', m.kinds) order by m.sort_order)
+            coalesce(json_agg(json_build_object('id', m.id, 'title', m.title, 'kinds', m.kinds, 'published', m.is_published, 'minutes', (m.content->>'minutes')::int) order by m.sort_order)
                      filter (where m.id is not null), '[]') modules
-       from courses c left join course_modules m on m.course_id=c.id and m.is_published
+       from courses c left join course_modules m on m.course_id=c.id
       where c.is_published group by c.id order by c.level`,
   );
 });

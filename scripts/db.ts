@@ -10,6 +10,11 @@ import { join } from "node:path";
 import { scryptSync, randomBytes } from "node:crypto";
 import pg from "pg";
 import { plans, courses, lessons } from "./seed-data";
+import { level1 } from "./curriculum/level1";
+import { level2 } from "./curriculum/level2";
+import { level3 } from "./curriculum/level3";
+
+const CONTENT: Record<number, unknown[]> = { 1: level1, 2: level2, 3: level3 };
 
 const url = process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL is required");
@@ -46,7 +51,7 @@ async function seed() {
     const { rows } = await client.query(
       `insert into courses (level,slug,title,description,min_plan) values ($1,$2,$3,$4,$5)
        on conflict (level) do update set slug=excluded.slug returning id`,
-      [c.level, c.slug, c.title, c.description, c.level <= 1 ? "free" : "member"],
+      [c.level, c.slug, c.title, c.description, "member"],
     );
     const courseId = rows[0].id;
     const { rowCount } = await client.query("select 1 from course_modules where course_id=$1", [courseId]);
@@ -56,6 +61,20 @@ async function seed() {
           `insert into course_modules (course_id, sort_order, title, kinds, is_published) values ($1,$2,$3,$4,true)`,
           [courseId, i, m, ["video", "text", "practice", "quiz", "practical", "instructor_review", "ai_review"]],
         );
+      }
+    }
+    // Draft teaching text for levels 1–3 (only filled when empty, so admin edits are kept).
+    // Levels without written content stay unpublished and show as "in preparation".
+    const content = CONTENT[c.level];
+    for (let i = 0; i < c.modules.length; i++) {
+      if (content?.[i]) {
+        await client.query(
+          `update course_modules set content = $3, kinds = '{text,practice,quiz}', is_published = true
+            where course_id=$1 and sort_order=$2 and content = '{}'::jsonb`,
+          [courseId, i, content[i]],
+        );
+      } else {
+        await client.query(`update course_modules set is_published = false where course_id=$1 and sort_order=$2 and content = '{}'::jsonb`, [courseId, i]);
       }
     }
   }

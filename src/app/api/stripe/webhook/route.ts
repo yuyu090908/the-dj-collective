@@ -3,6 +3,7 @@ import { env, services } from "@/lib/env";
 import { stripe } from "@/lib/integrations";
 import { q, q1 } from "@/lib/db";
 import { markPaymentFailed, markPaymentSucceeded } from "@/lib/booking/service";
+import { syncStripeSubscription } from "@/lib/subscription";
 
 /**
  * Stripe webhook. The ONLY place a real payment can confirm a booking.
@@ -28,6 +29,13 @@ export async function POST(req: Request) {
       case "checkout.session.completed":
       case "checkout.session.async_payment_succeeded": {
         const s = event.data.object as Stripe.Checkout.Session;
+        if (s.mode === "subscription") {
+          if (s.subscription) {
+            const id = typeof s.subscription === "string" ? s.subscription : s.subscription.id;
+            await syncStripeSubscription(await stripe().subscriptions.retrieve(id));
+          }
+          break;
+        }
         if (s.payment_status === "paid") {
           await markPaymentSucceeded(s.id, {
             method: s.payment_method_types?.[0],
@@ -37,10 +45,16 @@ export async function POST(req: Request) {
         }
         break;
       }
+      case "customer.subscription.created":
+      case "customer.subscription.updated":
+      case "customer.subscription.deleted":
+        await syncStripeSubscription(event.data.object as Stripe.Subscription);
+        break;
       case "checkout.session.async_payment_failed":
         await markPaymentFailed((event.data.object as Stripe.Checkout.Session).id, "failed");
         break;
       case "checkout.session.expired":
+        if ((event.data.object as Stripe.Checkout.Session).mode === "subscription") break;
         await markPaymentFailed((event.data.object as Stripe.Checkout.Session).id, "expired");
         break;
       case "charge.refunded": {

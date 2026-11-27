@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
 import { pageCtx, seo } from "@/lib/i18n/server";
-import { Alert, Container, PageHero, SectionHead, Tag } from "@/components/ui";
+import { Alert, Container, LinkButton, PageHero, SectionHead, Tag } from "@/components/ui";
+import { getUserPlan } from "@/lib/plan";
 import { getLessons, getPlans } from "@/lib/data";
 import { LessonCards } from "@/components/site/lessons";
 import { money } from "@/lib/i18n/format";
@@ -15,6 +16,7 @@ export default async function Pricing({ params }: PageProps<"/[locale]/pricing">
   const { locale, t } = await pageCtx(params);
   const p = t.pages.pricing;
   const [plans, lessons, user] = await Promise.all([getPlans().catch(() => []), getLessons().catch(() => []), getSessionUser().catch(() => null)]);
+  const planCode = user ? (await getUserPlan(user.id)).code : null;
   return (
     <>
       <PageHero kicker="Pricing" title={p.title} lead={p.lead} />
@@ -24,7 +26,7 @@ export default async function Pricing({ params }: PageProps<"/[locale]/pricing">
         <ul className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {plans.map((pl) => {
             const hi = pl.code === "artist_pro";
-            const isCurrent = user && pl.code === "free";
+            const isCurrent = planCode === pl.code;
             return (
               <li key={pl.code} className={`flex flex-col rounded-[8px] border p-6 ${hi ? "border-lime/60 bg-lime/[0.03]" : "border-line"}`}>
                 <p className="font-display text-sm font-semibold tracking-[0.12em]">{pl.name}</p>
@@ -41,7 +43,7 @@ export default async function Pricing({ params }: PageProps<"/[locale]/pricing">
                   ))}
                 </ul>
                 <div className="mt-auto pt-6">
-                  {isCurrent ? <Tag kind="lime">{p.current}</Tag> : pl.price_satang > 0 ? <Tag kind="phase">Phase 02</Tag> : null}
+                  {isCurrent ? <Tag kind="lime">{p.current}</Tag> : pl.price_satang > 0 ? <LinkButton locale={locale} href={`/app/subscription#plan-${pl.code}`} variant={hi ? "primary" : "secondary"}>{p.choose}</LinkButton> : null}
                 </div>
               </li>
             );

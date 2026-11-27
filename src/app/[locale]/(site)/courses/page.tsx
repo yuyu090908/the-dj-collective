@@ -2,6 +2,7 @@ import { pageCtx, seo } from "@/lib/i18n/server";
 import { Alert, Container, LinkButton, PageHero } from "@/components/ui";
 import { getCourses } from "@/lib/data";
 import { tr } from "@/lib/i18n/config";
+import { learnT } from "@/lib/i18n/p2/learn";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/courses">) {
   const { locale, t } = await pageCtx(params);
@@ -11,6 +12,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/courses"
 export default async function Courses({ params }: PageProps<"/[locale]/courses">) {
   const { locale, t } = await pageCtx(params);
   const c = t.pages.courses;
+  const s = learnT(locale);
   const courses = await getCourses().catch(() => []);
   const kinds = Object.entries(c.kinds);
   return (
@@ -38,15 +40,17 @@ export default async function Courses({ params }: PageProps<"/[locale]/courses">
                 {course.modules.map((m, i) => (
                   <li key={m.id} className="flex min-h-14 items-center gap-4 border-b border-line px-5 py-3 sm:odd:border-r">
                     <span className="kicker tnum w-8">{course.level}.{i + 1}</span>
-                    <span className="text-sm">{tr(m.title, locale)}</span>
+                    <span className="flex-1 text-sm">{tr(m.title, locale)}</span>
+                    {!m.published && <span className="text-[0.6875rem] uppercase tracking-[0.08em] text-stone">{s.preparing}</span>}
                   </li>
                 ))}
               </ol>
             </li>
           ))}
         </ol>
-        <div className="mt-10 flex justify-center">
-          <LinkButton locale={locale} href="/booking">{t.nav.book}</LinkButton>
+        <div className="mt-10 flex flex-wrap justify-center gap-3">
+          <LinkButton locale={locale} href="/app/learning">{s.start}</LinkButton>
+          <LinkButton locale={locale} href="/booking" variant="secondary">{t.nav.book}</LinkButton>
         </div>
       </Container>
     </>
