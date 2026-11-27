@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DJ_PLAYLISTS Version="1.0.0">
+  <PRODUCT Name="rekordbox" Version="6.8.0" Company="AlphaTheta"/>
+  <COLLECTION Entries="2">
+    <TRACK TrackID="1" Name="XML Track One" Artist="Test Artist E" Genre="Tech House" TotalTime="372" AverageBpm="124.00" Tonality="9A"/>
+    <TRACK TrackID="2" Name="XML Track Two" Artist="Test Artist F" Genre="Tech House" TotalTime="401" AverageBpm="125.00" Tonality="Dbm"/>
+  </COLLECTION>
+</DJ_PLAYLISTS>

@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import { bpmDelta, parseCsv, relation, targetEnergy, toCamelot } from "../src/lib/sets/logic";
+let n = 0; const ok = (s: string) => { n++; console.log("  ✓", s); };
+assert.equal(toCamelot("Am"), "8A"); assert.equal(toCamelot("C"), "8B"); assert.equal(toCamelot("F#m"), "11A"); assert.equal(toCamelot("Gbm"), "11A");
+assert.equal(toCamelot("Dbmaj"), "3B"); assert.equal(toCamelot("Ebm"), "2A"); assert.equal(toCamelot("8a"), "8A"); assert.equal(toCamelot("1m"), "8A"); assert.equal(toCamelot("1d"), "8B");
+assert.equal(toCamelot("A minor"), "8A"); assert.equal(toCamelot("E"), "12B"); assert.equal(toCamelot("foo"), null); ok("key → Camelot (musical, Camelot, Open Key)");
+assert.equal(bpmDelta(124, 126), 1.6); assert.equal(bpmDelta(128, 64), 0); assert.equal(bpmDelta(null, 120), null); ok("BPM change incl. half/double time");
+assert.equal(relation("8A", "9A"), "adjacent"); assert.equal(relation("8A", null), null); ok("Camelot relation");
+assert.equal(targetEnergy("peak", 0, 10), 7); assert.equal(targetEnergy("closing", 9, 10), 5); ok("slot energy curve");
+const csv = parseCsv('Title,Artist,BPM,Key,Time,Energy\n"Hello, World",DJ A,124,Am,6:05,7\nNo bpm,,,, ,\n,skip,1,1,1,1\n');
+assert.equal(csv.length, 2); assert.deepEqual(csv[0], { title: "Hello, World", artist: "DJ A", bpm: 124, camelot: "8A", duration_sec: 365, genre: "", energy: 7 });
+assert.equal(csv[1].bpm, null); ok("CSV import with quotes, blanks and missing titles");
+assert.equal(parseCsv("Name;BPM\nX;122,5\n")[0].bpm, 122.5); ok("semicolon CSV with decimal comma");
+console.log(`sets: ${n} checks passed`);

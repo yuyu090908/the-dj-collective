@@ -1,6 +1,6 @@
 import { adminPage } from "@/lib/page-guards";
 import { q } from "@/lib/db";
-import { money, dateTime } from "@/lib/i18n/format";
+import { money, dateTime, dateOnly } from "@/lib/i18n/format";
 import { PageTitle } from "@/components/app/shell";
 import { ActionForm } from "@/components/forms";
 import { ServiceStatus } from "@/components/app/services";
@@ -135,7 +135,7 @@ export default async function AdminSettings({ params }: PageProps<"/[locale]/adm
                 <code className="font-mono">{c.code}</code>
                 <span className="tnum">{c.percent_off}%</span>
                 <span className="tnum text-stone">{c.redemptions}/{c.max_redemptions ?? "∞"}</span>
-                {c.valid_until && <span className="text-stone">→ {dateTime(c.valid_until, locale, "Asia/Bangkok", { dateStyle: "medium" })}</span>}
+                {c.valid_until && <span className="text-stone">→ {dateOnly(c.valid_until, locale, "Asia/Bangkok")}</span>}
                 {c.is_active ? <Tag kind="live">ON</Tag> : <Tag>OFF</Tag>}
                 <form action={toggleCouponAction} className="ml-auto">
                   <input type="hidden" name="id" value={c.id} />

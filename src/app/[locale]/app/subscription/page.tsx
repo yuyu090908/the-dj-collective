@@ -5,7 +5,7 @@ import { services } from "@/lib/env";
 import { PageTitle } from "@/components/app/shell";
 import { ActionForm } from "@/components/forms";
 import { Alert, Tag, cx } from "@/components/ui";
-import { money, dateTime, fmt } from "@/lib/i18n/format";
+import { money, dateTime, dateOnly, fmt } from "@/lib/i18n/format";
 import { subT } from "@/lib/i18n/p2/sub";
 import { cancelDemoAction, manageBillingAction, subscribeAction } from "@/lib/subscription-actions";
 
@@ -48,7 +48,7 @@ export default async function Subscription({ params, searchParams }: PageProps<"
           {sub?.provider === "demo" && <Tag kind="demo" className="mt-2">DEMO</Tag>}
           {sub?.current_period_end && (
             <p className="mt-2 text-sm text-stone tnum">
-              {fmt(sub.cancel_at_period_end ? s.ends : s.renews, { d: dateTime(sub.current_period_end, locale, user.timezone, { dateStyle: "medium" }) })}
+              {fmt(sub.cancel_at_period_end ? s.ends : s.renews, { d: dateOnly(sub.current_period_end, locale, user.timezone) })}
             </p>
           )}
           {sub?.status === "past_due" && <div className="mt-3"><Alert kind="error">{s.pastDue}</Alert></div>}

@@ -30,3 +30,7 @@ export function timeOnly(iso: string | Date, locale: Locale, timeZone: string) {
     new Date(iso),
   );
 }
+
+export function dateOnly(iso: string | Date, locale: Locale, timeZone: string) {
+  return new Intl.DateTimeFormat(intlLocale[locale], { timeZone, dateStyle: "medium" }).format(new Date(iso));
+}

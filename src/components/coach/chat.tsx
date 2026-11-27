@@ -106,14 +106,14 @@ export function CoachChat({ locale, s, connected, conversationId, initial, mixes
       <div className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3 text-sm">
         <span className="kicker">{s.attach}</span>
         <label className="flex items-center gap-2">
-          <span className="text-stone">{s.mix}</span>
+          <span className="whitespace-nowrap text-stone">{s.mix}</span>
           <select value={mixId} onChange={(e) => setMixId(e.target.value)} className={cx(inputCls, "min-h-11 w-auto max-w-48 py-1")} disabled={busy} data-testid="coach-mix">
             <option value="">{s.none}</option>
             {mixes.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
           </select>
         </label>
         <label className="flex items-center gap-2">
-          <span className="text-stone">{s.set}</span>
+          <span className="whitespace-nowrap text-stone">{s.set}</span>
           <select value={setId} onChange={(e) => setSetId(e.target.value)} className={cx(inputCls, "min-h-11 w-auto max-w-48 py-1")} disabled={busy}>
             <option value="">{s.none}</option>
             {sets.map((o) => <option key={o.id} value={o.id}>{o.label}</option>)}
